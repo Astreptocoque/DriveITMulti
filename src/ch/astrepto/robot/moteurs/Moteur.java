@@ -12,6 +12,7 @@ public  class Moteur {
 	protected RegulatedMotor motor;
 	protected int maxSpeed = 200;
 	protected int destinationDegres;
+	protected int currentSpeed;
 	
 	public Moteur(MoteursTypes type, Port port) {
 		

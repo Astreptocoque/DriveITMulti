@@ -1,6 +1,7 @@
 package ch.astrepto.robot.moteurs;
 
 import ch.astrepto.robot.RobotAttributs;
+import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
@@ -12,8 +13,8 @@ public class TractionMotor {
 	private RegulatedMotor[] synchro;
 	
 	private static boolean isMoving = false;
-	public final static int maxSpeed = 400;
-	private int speed = maxSpeed;
+	public final static int maxSpeed = 200;
+	private double speed = maxSpeed;
 
 	public TractionMotor(MoteursTypes type, Port portLeft, Port portRight) {
 		motorLeft = new Moteur(type, portLeft);
@@ -25,8 +26,8 @@ public class TractionMotor {
 		motorLeft.motor.setAcceleration(2000);
 		motorRight.motor.setAcceleration(2000);
 
-		motorLeft.motor.setSpeed(speed);
-		motorRight.motor.setSpeed(speed);
+		motorLeft.motor.setSpeed((int) speed);
+		motorRight.motor.setSpeed((int) speed);
 	}
 
 	/**
@@ -40,12 +41,18 @@ public class TractionMotor {
 		double speedLeft;
 		double speedRight;
 		double speedAtFirst = maxSpeed;
+		double speedAtLast = 0;
 		
-		double a = -speedAtFirst/(RobotAttributs.lastLimit - RobotAttributs.firstLimit);
-		double b = speedAtFirst / (RobotAttributs.lastLimit - RobotAttributs.firstLimit) *RobotAttributs.lastLimit;
+		if(distance > RobotAttributs.firstLimit)
+			distance = RobotAttributs.firstLimit;
+		if(distance < RobotAttributs.lastLimit)
+			distance = RobotAttributs.lastLimit;
+		
+		double a = (speedAtLast - speedAtFirst)/(RobotAttributs.lastLimit - RobotAttributs.firstLimit);
+		double b = speedAtFirst - (speedAtLast-speedAtFirst)/(RobotAttributs.lastLimit-RobotAttributs.firstLimit)*RobotAttributs.firstLimit;
 		double speed = a*distance +b;
 		
-		if(angleCourbure == 0 || speed == 0) {
+		if(angleCourbure == 0 || (int) speed == 0) {
 			speedLeft = speed;
 			speedRight = speed;
 		}else{
@@ -57,13 +64,15 @@ public class TractionMotor {
 		}
 		
 		// set la vitesse
+		motorLeft.motor.startSynchronization();
 		motorLeft.motor.setSpeed((int) speedLeft);
 		motorRight.motor.setSpeed((int) speedRight);
-
+		motorLeft.motor.endSynchronization();
+		this.speed = speed;
+		
 		if (speed == 0)
-			isMoving = false;
-		else if(isMoving == false) {
-			isMoving = true;
+			move(false);
+		else {
 			move(true);
 		}
 	}
@@ -77,7 +86,6 @@ public class TractionMotor {
 	 */
 	public void move(boolean move) {
 		motorLeft.motor.startSynchronization();
-
 		if (move) {
 			motorLeft.motor.backward();
 			motorRight.motor.backward();

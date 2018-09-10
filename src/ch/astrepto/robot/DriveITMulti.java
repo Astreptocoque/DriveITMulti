@@ -1,6 +1,5 @@
 package ch.astrepto.robot;
 
-import ch.astrepto.robot.capteurs.UltrasonicSensor;
 import lejos.hardware.Button;
 
 public class DriveITMulti {
@@ -21,39 +20,28 @@ public class DriveITMulti {
 		do {
 			if (!Track.inCrossroads && !Track.overtaking) {
 				float intensity = rob.updateLightIntensity();
-				// Détection du carrefour (+3 pour les variations lumineuses)
-				if (intensity <= Track.crossLineValue + 1)
-					// Indique qu'on est arrivé au carrefour
-					Track.crossroads = true;
+				// Détection du carrefour
+			/*	if (intensity <= Track.crossLineValue + 1)
+					Track.crossroads = true;*/
 			}
+			
+			if(!Track.verifiyFreeWay && !Track.crossroads) 
+				rob.updateDistance();
 
-			if (!Track.inCrossroads && !Track.crossroads && !Track.overtaking && Track.hangOnTrack) {
+			if (!Track.inCrossroads && !Track.crossroads && !Track.overtaking && Track.hangOnTrack) 
 				rob.updateDirection(true);
-				rob.updateUltrasonicDirection();
 
-			}
-			// GESTION DE LA VITESSE AUTOMATIQUE
-			// Est maj si pas "intialisation d'un dépassement" et si pas "vérification
-			// peut dépasser")
-			if (!Track.overtaking && !Track.verifiyFreeWay && !Track.ultrasonicRepositioning) {
+			if (!Track.overtaking && !Track.verifiyFreeWay && !Track.ultrasonicRepositioning) 
 				rob.updateSpeed();
-			}
-
-			// GESTION DE L'ARRIVEE AU CROISEMENT
-			// Est maj si "arrivé au crossroads" mais pas "en train de passer le
-			// crossroads"
-			if (Track.crossroads && !Track.inCrossroads) {
+/*
+			// entrée dans le croisement
+			if (Track.crossroads && !Track.inCrossroads)
 				crossroads(rob);
-			}
 
-			// GESTION A L'INTERIEUR DU CROISEMENT
-			// Est maj si "en train de passer le crossroads"
-			if (Track.inCrossroads) {
-				// on attends de l'avoir passé pour redémarrer les fonctions de
-				// direction
+			// sortie du croisement
+			if (Track.inCrossroads) 
 				crossroadsEnd(rob);
-			}
-
+*/
 	/*		if (!Track.crossroads && !Track.verifiyFreeWay && Track.hangOnTrack
 					&& !Track.ultrasonicRepositioning) {
 				rob.isThereAnOvertaking();
@@ -78,10 +66,9 @@ public class DriveITMulti {
 			}
 			*/
 
-		} while (!Button.ESCAPE.isDown());
+		} while (!Button.UP.isDown());
 
 		rob.robotStop();
-
 	}
 	
 	/**
@@ -98,18 +85,13 @@ public class DriveITMulti {
 		// indique qu'on est en train de passer le croisement
 		Track.inCrossroads = true;
 		rob.tractionMotor.resetTachoCount();
-		// les roues se remettent droites
-		int angle = 0;
-		rob.ultrasonicMotor.goTo(-angle);
-		rob.directionMotor.goTo(angle);
+
+		rob.ultrasonicMotor.goTo(0);
+		rob.directionMotor.goTo(0);
 
 		// si on est au croisement à priorité
-		if (Track.part == -1) {
-			// lance le balayage de priorité
+		if (Track.part == -1)
 			waitRightPriorityOk(rob);
-			rob.ultrasonicMotor.goTo(0);
-			rob.tractionMotor.move(true);
-		}
 	}
 
 	/**
@@ -254,67 +236,59 @@ public class DriveITMulti {
 	 * devant avoir la priorité n'est détecté
 	 */
 	private static void waitRightPriorityOk(RobotECB rob) {
-		double startDetectionAngle;
-		double endDetectionAngle;
-		// si on est du grand côté
-		if (Track.side == 1) {
-			// ArcTan de opposé (6cm) sur adjacent (long.Piste + 8d, la
-			// profondeur du capteur dans le robot. Le tout *180/pi car
-			// la atan renvoi un radian
-			startDetectionAngle = Math.atan(6d / (Track.crossroadsLength + 8d)) * 180d / Math.PI;
-			endDetectionAngle = Math.atan(40d / 8d) * 180d / Math.PI;
+		
+		double distanceDetectBeforeCrossLine; // cm
+		double zoneFirstAngle; //degrés
+		double zoneLastAngle; // degrés
+		
+		if(Track.side == 1) {
+			distanceDetectBeforeCrossLine = 30;
+			zoneFirstAngle = 5;
+			zoneLastAngle = 50;
+		}else {
+			distanceDetectBeforeCrossLine = 50;
+			zoneFirstAngle = 5;
+			zoneLastAngle = 40;
 		}
-		// si on est du petit côté
-		else {
-			startDetectionAngle = Math.atan((Track.crossroadsLength - 6d) / (Track.crossroadsLength + 8d))
-					* 180d / Math.PI;
-			endDetectionAngle = Math.atan((Track.crossroadsLength - 6d + 40d) / 8d) * 180d / Math.PI;
-		}
-
-		// on transforme au préalable les ° du cercle en ° de l'ultrason
-		startDetectionAngle = RobotAttributs.ultrasonicMaxDegree / 90 * startDetectionAngle;
-		endDetectionAngle = RobotAttributs.ultrasonicMaxDegree / 90 * endDetectionAngle;
-
+		
 		// l'ultrason se rend au début de son tracé de mesure
-		rob.ultrasonicMotor.goTo((int) startDetectionAngle);
+		rob.ultrasonicMotor.goTo(RobotAttributs.degresCourbureToDegresUltrason(90-zoneFirstAngle));
 		rob.ultrasonicMotor.waitComplete();
 
 		// on commence la detection
 		boolean blockedTrack = true;
 		int sens = 1;
-		float distance;
 		boolean vehicle = false;
+		double distanceMesured;
+		double distanceCalculated;
 
 		// on répète tant que la piste n'est pas libre
 		while (blockedTrack) {
 
-			// l'ultrason boug
 			if (sens == 1)
-				rob.ultrasonicMotor.goTo((int) endDetectionAngle);
+				rob.ultrasonicMotor.goTo(RobotAttributs.degresCourbureToDegresUltrason(90-zoneLastAngle));
 			else
-				rob.ultrasonicMotor.goTo((int) startDetectionAngle);
+				rob.ultrasonicMotor.goTo(RobotAttributs.degresCourbureToDegresUltrason(90-zoneFirstAngle));
 
 			while (!rob.ultrasonicMotor.isPreviousMoveComplete()) {
-				distance = rob.ultrasonic.getValue();
+				distanceMesured = rob.ultrasonic.getValue();
+				distanceCalculated = distanceDetectBeforeCrossLine/Math.cos((Math.toRadians(90 - RobotAttributs.degresUltrasonToDegresCourbure(rob.ultrasonicMotor.getCurrentDegres()))));
+
 				// si on détecte un véhicule
-				if (distance <= UltrasonicSensor.maxDetectedDistance -1)
+				if (distanceMesured <= distanceCalculated)
 					vehicle = true;
 			}
+			
 			// à la fin de la détection, on regarde si un véhicule a été détecté
 			if (vehicle) {
 				vehicle = false;
 				sens *= -1;
 			}
-			// sinon on sort de la boucle blocked track
-			else {
+			else 
 				blockedTrack = false;
-			}
 		}
-	}
-	private static void end(RobotECB rob) {
-		rob.colorDroite.close();
-		rob.colorGauche.close();
-		rob.ultrasonic.close();
-		rob.coffre.disConnect();
+		
+		rob.ultrasonicMotor.goTo(0);
+		rob.tractionMotor.move(true);
 	}
 }

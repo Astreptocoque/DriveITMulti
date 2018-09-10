@@ -17,7 +17,7 @@ public class DirectionMotor extends Moteur{
 
 	public DirectionMotor(MoteursTypes type, Port port) {
 		super(type, port);
-		this.maxSpeed = 200;
+		this.maxSpeed = 160;
 		this.motor.setSpeed(this.maxSpeed);
 		this.directionTouchSensor = new TouchSensorEV3(SensorPort.S2);
 

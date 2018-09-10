@@ -5,13 +5,17 @@ import lejos.hardware.sensor.NXTTouchSensor;
 
 public class TouchSensorNXT extends Capteur {
 
-	private NXTTouchSensor color;
+	private NXTTouchSensor touch;
 
 	public TouchSensorNXT(Port port){
 		super();
 		this.port = port;
-		this.color= new NXTTouchSensor(port);
-		this.sensor = this.color.getTouchMode();
+		this.touch= new NXTTouchSensor(port);
+		this.sensor = this.touch.getTouchMode();
 		this.sampleSensor = new float[this.sensor.sampleSize()];
+	}
+	
+	public void close() {
+		touch.close();
 	}
 }

@@ -12,6 +12,7 @@ public abstract class RobotAttributs {
 	// LIMITES DE DETECTION D'UN VEHICULE
 	public final static float lastLimit = 15f; // en dessous, le robot stop
 	public final static float firstLimit = 40f; // passé cette limite, le robot est à plein régime
+	public final static float crossingLimit = 50f; // limite de dégagement pour le croisement à priorité
 	
 	public static int degresCourbureToDegresRoue(double angle) {
 		
@@ -27,7 +28,7 @@ public abstract class RobotAttributs {
 
 	public static double degresCourbureToDegresUltrason(double angle) {
 		
-		angle = 90/2500*angle;
+		angle = 2500/90*angle;
 		return (int) angle;
 	}
 	

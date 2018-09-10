@@ -2,6 +2,7 @@ package ch.astrepto.robot.moteurs;
 
 import ch.astrepto.robot.RobotAttributs;
 import ch.astrepto.robot.capteurs.TouchSensorNXT;
+import lejos.hardware.Sound;
 import lejos.hardware.port.Port;
 import lejos.hardware.port.SensorPort;
 
@@ -11,10 +12,11 @@ public class UltrasonicMotor extends Moteur{
 	
 	public UltrasonicMotor(MoteursTypes type, Port port) {
 		super(type, port);
-		this.maxSpeed = 800;
+		this.maxSpeed = 740;
 		this.motor.setSpeed(this.maxSpeed);
 		this.ultrasonicTouchSensor = new TouchSensorNXT(SensorPort.S1);
-		
+		System.out.println("ultrason");
+		Sound.beepSequence();
 		initPosition();
 	}
 
@@ -26,6 +28,7 @@ public class UltrasonicMotor extends Moteur{
 			float touch = ultrasonicTouchSensor.getValue();
 
 			if (touch > 0) {
+				System.out.println("value " + touch);
 				motor.stop();
 				motor.rotate(-RobotAttributs.ultrasonicMaxDegree);
 				boucle = false;
@@ -47,11 +50,9 @@ public class UltrasonicMotor extends Moteur{
 		// arrête le moteur s'il est en train de bouger
 		if (motor.isMoving())
 			motor.stop();
-
 		double angle = RobotAttributs.degresCourbureToDegresUltrason(angleCourbature);
-		double currentDegres = super.getCurrentDegres();
+		double currentDegres = -super.getCurrentDegres();
 		double angleToDo;
-		
 		int max = RobotAttributs.ultrasonicMaxDegree;
 		// si l'angle dépasse les bornes
 		if(angle  > max) {
@@ -59,12 +60,11 @@ public class UltrasonicMotor extends Moteur{
 			destinationDegres = max;
 		}else if(angle < -max) {
 			angleToDo = max-currentDegres;
-			destinationDegres = max;
+			destinationDegres = -max;
 		}else {
 			angleToDo = angle - currentDegres;
 			destinationDegres = (int) angle;
 		}
-			
 		motor.rotate((int)-angleToDo, true);
 	}
 
@@ -72,7 +72,11 @@ public class UltrasonicMotor extends Moteur{
 		motor.waitComplete();
 	}
 
-	public boolean previousMoveComplete() {
+	public boolean isPreviousMoveComplete() {
 		return !motor.isMoving();
+	}
+	
+	public void close() {
+		ultrasonicTouchSensor.close();
 	}
 }

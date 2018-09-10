@@ -1,13 +1,10 @@
 package ch.astrepto.robot.capteurs;
 
 import lejos.hardware.port.Port;
-import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.NXTUltrasonicSensor;
-import lejos.robotics.SampleProvider;
 
 public class UltrasonicSensor extends Capteur {
 	
-	public final static int maxDetectedDistance = 50;
 	private NXTUltrasonicSensor ultrasonic;
 
 	public UltrasonicSensor(Port port) {
@@ -19,10 +16,9 @@ public class UltrasonicSensor extends Capteur {
 
 	public float getValue() {
 		float distance = super.getValue();
-
-		if (distance > maxDetectedDistance || distance == Float.POSITIVE_INFINITY) 
-			distance = maxDetectedDistance;
-
+		
+		if (distance == Float.POSITIVE_INFINITY)
+			distance = 250;
 		return distance;
 	}
 	
