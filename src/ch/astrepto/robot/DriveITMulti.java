@@ -100,13 +100,29 @@ public class DriveITMulti {
 	 */
 	public static void crossroadsEnd(RobotECB rob) {
 		// on attends de l'avoir passé pour redémarrer les fonctions de direction
+		// on attends de l'avoir passé pour redémarrer les fonctions de direction
 		if (rob.tractionMotor.getCurrentDegres() >= Track.crossroadsLength / RobotAttributs.cmInDegres) {
-			Track.inCrossroads = false;
-			Track.crossroads = false;
-			Track.justAfterCrossroads = true;
-			Track.changePart();
-			Track.changeSide();
-			rob.tractionMotor.resetTachoCount();
+
+			int intensityGauche = (int) rob.colorGauche.getValue();
+			int intensityDroite = (int) rob.colorDroite.getValue();
+
+			int diff = intensityGauche - intensityDroite;
+			
+			if(Math.abs(diff) > 5) {
+				Track.inCrossroads = false;
+				Track.crossroads = false;
+				Track.justAfterCrossroads = true;
+			
+				if((diff > 5 && ((Track.getPart() == 1 && Track.getSide() == -1)
+					|| (Track.getPart() == -1 && Track.getSide() == 1)))
+					|| (diff < 5 && ((Track.getPart() == 1 && Track.getSide() == 1)
+						|| (Track.getPart() == -1 && Track.getSide() == -1)))) {
+					Track.changeSide();
+				}
+			
+				Track.changePart();
+				rob.tractionMotor.resetTachoCount();
+			}
 		}
 	}
 
