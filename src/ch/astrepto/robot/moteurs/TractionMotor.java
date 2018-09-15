@@ -1,6 +1,7 @@
 package ch.astrepto.robot.moteurs;
 
 import ch.astrepto.robot.RobotAttributs;
+import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
@@ -107,12 +108,12 @@ public class TractionMotor {
 		
 		double degresZero = getCurrentDegres();
 		double degresToDo = RobotAttributs.centimetresToDegresTraction(nbCentimetres);
-		
+
 		move(true);
 		
 		while(getCurrentDegres() - degresZero < degresToDo)
 			Delay.msDelay(5);
-		
+
 		move(false);
 	}
 	

@@ -65,7 +65,6 @@ public class UltrasonicMotor extends Moteur{
 			angleToDo = angle - currentDegres;
 			destinationDegres = (int) angle;
 		}
-		System.out.println(currentDegres);
 		motor.rotate((int)angleToDo, true);
 	}
 

@@ -17,12 +17,15 @@ public class DriveITMulti {
 		Track.updateTrackInfos(rob.colorDroite.getValue());
 		System.out.println("Appuyer pour demarrer");
 		Button.ENTER.waitForPressAndRelease();
-		rob.robotStart();
+		//rob.robotStart();
 	
 		double speed = 0;
 		float intensity;
 		double time1 = 0;
 		double time2 = 0;
+		
+		depassement(rob);
+		Sound.beep();
 		
 		do {
 			if (!Track.inCrossroads && !Track.overtaking) {
@@ -39,17 +42,17 @@ public class DriveITMulti {
 
 			if (!Track.overtaking && !Track.ultrasonicRepositioning) {
 				speed = rob.updateSpeed();
-			/*	
+			
 				// si immobilisation de plus de 10sec
 				if(speed == 0) {
 					if(time2 == 0)
 						time1 = System.currentTimeMillis();
 					time2 = System.currentTimeMillis();
-					if(time2-time1 > 10000)
+					if(time2-time1 > 5000)
 						depassement(rob);
 				}else {
 					time2 = 0;
-				}*/
+				}
 			}
 
 			// entrée dans le croisement
@@ -75,17 +78,18 @@ public class DriveITMulti {
 		int speed = 100;
 		double teta = 60; //degrés du cercle
 		double tetaRad = Math.toRadians(teta);
-		double rayon = RobotAttributs.wheelSpacing / Math.tan(RobotAttributs.wheelCourbureMax);
+		double rayon = RobotAttributs.wheelSpacing / Math.tan(Math.toRadians(RobotAttributs.wheelCourbureMax));
 		
-		rob.tractionMotor.setSpeed(RobotAttributs.wheelCourbureMax*directionOtherSide, speed);
 		
 		// attente que l'autre coté soit libre
 		rob.ultrasonicMotor.goTo(90 * directionOtherSide);
-		while(rob.ultrasonic.getValue() > 45)
+		rob.ultrasonicMotor.waitComplete();
+		while(rob.ultrasonic.getValue() < 45)
 			Delay.msDelay(100);
 		rob.ultrasonicMotor.goTo(0);		
 		
 		//1er virage
+		rob.tractionMotor.setSpeed(RobotAttributs.wheelCourbureMax*directionOtherSide*-1, speed);
 		rob.directionMotor.goTo(RobotAttributs.wheelCourbureMax*directionOtherSide);
 		rob.directionMotor.waitComplete();
 		rob.tractionMotor.goTo(tetaRad*rayon);
@@ -93,13 +97,16 @@ public class DriveITMulti {
 		//analyseTerrain
 		
 		//bout droit
+		rob.tractionMotor.setSpeed(0, speed);
 		rob.directionMotor.goTo(0);
-		double cm = (RobotAttributs.distHorizontalBetweenRobots - 2*(rayon - tetaRad*rayon))/Math.cos(Math.PI/2-teta);
+		rob.directionMotor.waitComplete();
+		double cm = (RobotAttributs.distHorizontalBetweenRobots - 2*(rayon - tetaRad*rayon))/Math.cos(Math.PI/2-tetaRad);
 		rob.tractionMotor.goTo(cm);
 		
 		//analyseTerrain
 		
 		//2eme virage
+		rob.tractionMotor.setSpeed(RobotAttributs.wheelCourbureMax*directionOtherSide, speed);
 		rob.directionMotor.goTo(RobotAttributs.wheelCourbureMax*directionOtherSide*-1);
 		rob.directionMotor.waitComplete();
 		rob.tractionMotor.goTo(tetaRad*rayon);
@@ -112,18 +119,16 @@ public class DriveITMulti {
 	 * côté du croisement
 	 */
 	public static void crossroads(RobotECB rob) {
-		// n'est pas mis à la même condition juste en dessous pour accélérer le
-		// freinage (sinon lent à cause de goTo)
-//		if (Track.part == -1)
-			// arrête le robot
-			rob.tractionMotor.move(false);
+
+		rob.tractionMotor.move(false);
 
 		// indique qu'on est en train de passer le croisement
 		Track.inCrossroads = true;
 		rob.tractionMotor.resetTachoCount();
 
 		rob.ultrasonicMotor.goTo(0);
-	//	rob.directionMotor.goTo(0);
+
+		//correction
 		if (Track.getPart() == 1 && Track.getSide() == 1) 
 			rob.directionMotor.goTo(-5); 
 		 else if(Track.getPart() == -1 && Track.getSide() == 1)
@@ -224,7 +229,7 @@ public class DriveITMulti {
 			
 			time2 = System.currentTimeMillis();
 			//stop la detection après 15 seconde et on force le passage
-			if (time2-time1 > 25000) 
+			if (time2-time1 > 15000) 
 				blockedTrack = false;
 			
 			// à la fin de la détection, on regarde si un véhicule a été détecté
@@ -238,6 +243,5 @@ public class DriveITMulti {
 		
 		rob.ultrasonicMotor.goTo(0);
 		rob.ultrasonicMotor.waitComplete();
-	//	rob.tractionMotor.setSpeed(0, RobotAttributs.maxSpeed);
 	}
 }
