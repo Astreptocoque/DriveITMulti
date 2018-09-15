@@ -5,6 +5,7 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
+import lejos.utility.Delay;
 
 public class TractionMotor {
 
@@ -13,8 +14,7 @@ public class TractionMotor {
 	private RegulatedMotor[] synchro;
 	
 	private static boolean isMoving = false;
-	public final static int maxSpeed = 200;
-	private double speed = maxSpeed;
+	private double speed = RobotAttributs.maxSpeed;
 
 	public TractionMotor(MoteursTypes type, Port portLeft, Port portRight) {
 		motorLeft = new Moteur(type, portLeft);
@@ -36,11 +36,11 @@ public class TractionMotor {
 	 * la vitesse de chaque moteur sera égale
 	 * 
 	 */
-	public void setSpeed(double angleCourbure, double distance) {
+	public double setSpeed(double angleCourbure, double distance) {
 		
 		double speedLeft;
 		double speedRight;
-		double speedAtFirst = maxSpeed;
+		double speedAtFirst = RobotAttributs.maxSpeed;
 		double speedAtLast = 0;
 		
 		if(distance > RobotAttributs.firstLimit)
@@ -70,14 +70,52 @@ public class TractionMotor {
 		motorLeft.motor.endSynchronization();
 		this.speed = speed;
 		
-		if (speed == 0)
+		if (speed == 0) {
 			move(false);
-		else {
+			Sound.playNote(Sound.PIANO, 100, 1000);
+		}else {
 			move(true);
 		}
+		
+		return(speed);
 	}
 
-
+	public double setSpeed(double angleCourbure, int speed) {
+		
+		double speedLeft;
+		double speedRight;
+		
+		if(angleCourbure == 0 || (int) speed == 0) {
+			speedLeft = speed;
+			speedRight = speed;
+		}else{
+			double radius = RobotAttributs.baseLength/Math.tan(Math.toRadians(angleCourbure));
+			double rotationSpeed = speed/radius;
+			
+			speedLeft = rotationSpeed*(radius- RobotAttributs.wheelSpacing/2);
+			speedRight = rotationSpeed*(radius+ RobotAttributs.wheelSpacing/2);
+		}
+		
+		motorLeft.motor.setSpeed((int) speedLeft);
+		motorRight.motor.setSpeed((int) speedRight);
+		this.speed = speed;
+		
+		return speed;
+	}
+	
+	public void goTo(double nbCentimetres) {
+		
+		double degresZero = getCurrentDegres();
+		double degresToDo = RobotAttributs.centimetresToDegresTraction(nbCentimetres);
+		
+		move(true);
+		
+		while(getCurrentDegres() - degresZero < degresToDo)
+			Delay.msDelay(5);
+		
+		move(false);
+	}
+	
 	/**
 	 * Gestion du mouvement du véhicule (en marche et à l'arret)
 	 * 

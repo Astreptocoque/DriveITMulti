@@ -30,7 +30,7 @@ public class UltrasonicMotor extends Moteur{
 			if (touch > 0) {
 				System.out.println("value " + touch);
 				motor.stop();
-				motor.rotate(-RobotAttributs.ultrasonicMaxDegree);
+				motor.rotate(-(RobotAttributs.ultrasonicMaxDegree+50));
 				boucle = false;
 			}
 		}
@@ -51,7 +51,7 @@ public class UltrasonicMotor extends Moteur{
 		if (motor.isMoving())
 			motor.stop();
 		double angle = RobotAttributs.degresCourbureToDegresUltrason(angleCourbature);
-		double currentDegres = -super.getCurrentDegres();
+		double currentDegres = super.getCurrentDegres();
 		double angleToDo;
 		int max = RobotAttributs.ultrasonicMaxDegree;
 		// si l'angle dépasse les bornes
@@ -65,7 +65,8 @@ public class UltrasonicMotor extends Moteur{
 			angleToDo = angle - currentDegres;
 			destinationDegres = (int) angle;
 		}
-		motor.rotate((int)-angleToDo, true);
+		System.out.println(currentDegres);
+		motor.rotate((int)angleToDo, true);
 	}
 
 	public void waitComplete() {

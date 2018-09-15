@@ -35,7 +35,7 @@ public class DirectionMotor extends Moteur{
 		if (motor.isMoving())
 			motor.stop();
 		
-		double angle =  RobotAttributs.degresCourbureToDegresRoue(angleCourbure);
+		double angle =  -RobotAttributs.degresCourbureToDegresRoue(angleCourbure);
 		double currentDegres = super.getCurrentDegres();
 
 		// transformation de l'angle final en nombre de ° que doit faire le robot
@@ -70,22 +70,22 @@ public class DirectionMotor extends Moteur{
 
 		//en fonction du coté de la piste
 		if(Track.getPart() == 1 && Track.getSide() == 1) {
-			angleForMaxLum = angleCourbureContreDirection;
-			angleForMinLum = -maxDegreCourbureDegres;
-		}else if (Track.getPart() == 1 && Track.getSide() == -1) {
-			angleForMaxLum = -maxDegreCourbureDegres;
-			angleForMinLum = angleCourbureContreDirection;
-		}else if (Track.getPart() == -1 && Track.getSide() == 1) {
 			angleForMaxLum = -angleCourbureContreDirection;
-			angleForMinLum =  maxDegreCourbureDegres;
-		}else {
+			angleForMinLum = maxDegreCourbureDegres;
+		}else if (Track.getPart() == 1 && Track.getSide() == -1) {
 			angleForMaxLum = maxDegreCourbureDegres;
-			angleForMinLum =  -angleCourbureContreDirection;
+			angleForMinLum = -angleCourbureContreDirection;
+		}else if (Track.getPart() == -1 && Track.getSide() == 1) {
+			angleForMaxLum = angleCourbureContreDirection;
+			angleForMinLum =  -maxDegreCourbureDegres;
+		}else {
+			angleForMaxLum = -maxDegreCourbureDegres;
+			angleForMinLum =  angleCourbureContreDirection;
 		}
 		
-		double a = (angleForMaxLum - angleForMinLum) / (Track.minValue - Track.maxValue);
-		double b = (angleForMinLum - angleForMaxLum) / (Track.minValue - Track.maxValue)
-				* Track.minValue + angleForMaxLum;
+		double a = (angleForMinLum - angleForMaxLum) / (Track.minValue - Track.maxValue);
+		double b = angleForMaxLum - (angleForMinLum - angleForMaxLum) / (Track.minValue - Track.maxValue)
+				* Track.maxValue;
 
 		angleCourbure = a * intensity + b;
 
@@ -146,5 +146,9 @@ public class DirectionMotor extends Moteur{
 
 	public void close() {
 		directionTouchSensor.close();
+	}
+	
+	public void waitComplete() {
+		motor.waitComplete();
 	}
 }

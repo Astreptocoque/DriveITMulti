@@ -34,9 +34,11 @@ public class RobotECB {
 		ultrasonic = new UltrasonicSensor(SensorPort.S3);
 		directionMotor = new DirectionMotor(MoteursTypes.EV3MediumMotor, MotorPort.A);
 		tractionMotor = new TractionMotor(MoteursTypes.EV3Motor, MotorPort.C, MotorPort.B);
+		Sound.setVolume(30);
 		Sound.beep();
 		ultrasonicMotor = new UltrasonicMotor(MoteursTypes.NXTMotor, MotorPort.D);
 		Sound.beep();
+		Sound.setVolume(100);
 	}
 
 	public boolean updateDirection(boolean ultrasonicConnected) {
@@ -73,9 +75,10 @@ public class RobotECB {
 		return intensity;
 	}
 	
-	public void updateSpeed() {
+	public double  updateSpeed() {
 		double angle = RobotAttributs.degresRoueToDegresCourbure(directionMotor.getCurrentDegres());
-		tractionMotor.setSpeed(angle, distance);
+		double speed = tractionMotor.setSpeed(angle, distance);
+		return speed;
 	}
 
 	public void robotStop() {

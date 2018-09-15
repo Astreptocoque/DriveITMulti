@@ -19,7 +19,6 @@ public class Track {
 	public static final float crossLineValue = 2; // ligne noire
 	
 	// VARIABLES POUR LES DEPASSEMENTS
-	public static boolean verifiyFreeWay = false; // true si on lance la procédure de vérification
 	public static boolean overtaking = false; // si en train de dépasser
 	public static int overtakingPart = 0;
 	public static boolean hangOnTrack = true; // si en train de suivre la piste (avec le
