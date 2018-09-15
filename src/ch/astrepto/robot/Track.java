@@ -17,20 +17,9 @@ public class Track {
 	public static final float maxValue = 60; // blanc
 	public static final float minValue = 4; // bleu foncé
 	public static final float crossLineValue = 2; // ligne noire
-	
-	// VARIABLES POUR LES DEPASSEMENTS
-	public static boolean overtaking = false; // si en train de dépasser
-	public static int overtakingPart = 0;
-	public static boolean hangOnTrack = true; // si en train de suivre la piste (avec le
-							// dégradé)
-	public static boolean ultrasonicRepositioning = false;
 	public final static float crossroadsLength = 50; // en cm
-	// longueur minimal d'un côté de la piste
-	public final static float trackPartLength = (float) (((smallRadius + gradientWidth) * 2 * Math.PI)/RobotAttributs.cmInDegres);
-	// le bout droit + le 1/4 du petit virage de la piste + une marge de 10, en degrés
-	public final static float overtakingLength = (float) ((crossroadsLength
-			+ ((smallRadius + gradientWidth / 2) * 2 * Math.PI) / 4) + 10) / RobotAttributs.cmInDegres;
-
+	public final static double littleSideLength = 3/4*2*Math.PI*(smallRadius+gradientWidth/2); //3/4 du cercle est la piste effective
+	public final static double largeSideLength = 3/4*2*Math.PI*(largeRadius-gradientWidth/2);
 
 	public static void changeSide() {
 		side *= -1;

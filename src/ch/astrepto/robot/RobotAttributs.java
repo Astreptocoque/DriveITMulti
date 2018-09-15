@@ -17,6 +17,7 @@ public abstract class RobotAttributs {
 	
 	public final static float distHorizontalBetweenRobots = 23;
 	public final static int maxSpeed = 200;
+	public final static double angleDepassement = Math.toRadians(60);
 
 	public static int degresCourbureToDegresRoue(double angle) {
 		
