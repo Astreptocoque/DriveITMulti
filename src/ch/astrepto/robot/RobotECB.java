@@ -9,6 +9,8 @@ import ch.astrepto.robot.moteurs.DirectionMotor;
 import ch.astrepto.robot.moteurs.MoteursTypes;
 import ch.astrepto.robot.moteurs.TractionMotor;
 import ch.astrepto.robot.moteurs.UltrasonicMotor;
+import lejos.hardware.Button;
+import lejos.hardware.LED;
 import lejos.hardware.Sound;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
@@ -33,9 +35,11 @@ public class RobotECB {
 	private double currentDestination;
 
 	public RobotECB() {
-
+		
+		Button.LEDPattern(8);
 		coffre = new RobotRemote();
 		System.out.println("coffre - ok");
+		Button.LEDPattern(6);
 		directionTouchSensor = new TouchSensorEV3Remote(coffre, "S4");
 		System.out.println("direc.Touch - ok");
 		colorGauche = new ColorSensor(SensorPort.S4);
@@ -56,6 +60,7 @@ public class RobotECB {
 		ultrasonicMotor = new UltrasonicMotor(MoteursTypes.NXTMotor, MotorPort.D, ultrasonicTouchSensor);
 		System.out.println("ultr.Motor - ok");
 		Sound.setVolume(20);
+		Button.LEDPattern(1);
 	}
 
 	public boolean updateDirection(boolean ultrasonicConnected) {
@@ -322,7 +327,6 @@ public class RobotECB {
 		ultrasonicTouchSensor.close();
 		directionTouchSensor.close();
 		ultrasonic.close();
-		
 	}
 
 	public void robotStart() {

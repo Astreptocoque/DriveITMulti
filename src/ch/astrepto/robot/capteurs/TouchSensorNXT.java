@@ -34,6 +34,12 @@ public void waitForPressAndRelease() {
 		}while(boucle);
 	}
 	
+public boolean isPressed() {
+	if(getValue() == 100)
+		return true;
+	else
+		return false;
+}
 	public void close() {
 		touch.close();
 	}

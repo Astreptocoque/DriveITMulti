@@ -16,8 +16,10 @@ public class DriveITMulti {
 		Sound.twoBeeps();
 		rob.touch.waitForPressAndRelease();
 		Track.updateTrackInfos(rob.colorDroite.getValue());
+		System.out.println("");
 		System.out.println("Analyse track ok, appuyez pour demarrer");
 		rob.touch.waitForPressAndRelease();
+		Button.LEDPattern(0);
 		
 		//rob.robotStart();
 		float intensity;
@@ -47,7 +49,6 @@ public class DriveITMulti {
 				if(time2 == 0)
 					time1 = System.currentTimeMillis();
 				time2 = System.currentTimeMillis();
-		//		Sound.playNote(Sound.PIANO, 100, 1000);
 				time = time2-time1;
 				Sound.playTone((int)(100+time/8), 100, 100);
 				if(time2-time1 > 5000)
@@ -65,7 +66,7 @@ public class DriveITMulti {
 			if (Track.inCrossroads) 
 				rob.crossroadsEnd();
 
-		} while (!Button.UP.isDown());
+		} while (!rob.touch.isPressed());
 
 		rob.robotStop();
 	}
