@@ -10,11 +10,11 @@ public class UltrasonicMotor extends Moteur{
 	
 	private TouchSensorNXT ultrasonicTouchSensor;
 	
-	public UltrasonicMotor(MoteursTypes type, Port port) {
+	public UltrasonicMotor(MoteursTypes type, Port port, TouchSensorNXT ultrasonicTouchSensor) {
 		super(type, port);
 		this.maxSpeed = 740;
 		this.motor.setSpeed(this.maxSpeed);
-		this.ultrasonicTouchSensor = new TouchSensorNXT(SensorPort.S1);
+		this.ultrasonicTouchSensor = ultrasonicTouchSensor;
 		System.out.println("ultrason");
 		Sound.beepSequence();
 		initPosition();
@@ -74,9 +74,5 @@ public class UltrasonicMotor extends Moteur{
 
 	public boolean isPreviousMoveComplete() {
 		return !motor.isMoving();
-	}
-	
-	public void close() {
-		ultrasonicTouchSensor.close();
 	}
 }

@@ -1,5 +1,7 @@
 package ch.astrepto.robot;
 
+import lejos.hardware.Sound;
+
 public class Track {
 
 	// VARIABLES POUR LA SITUATION SUR LA PISTE
@@ -58,6 +60,8 @@ public class Track {
 
 		// on commence toujours sur le grand côté
 		Track.side = 1;
+		
+		Sound.twoBeeps();
 	}
 
 }

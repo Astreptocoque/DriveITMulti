@@ -73,7 +73,6 @@ public class TractionMotor {
 		
 		if (speed == 0) {
 			move(false);
-			Sound.playNote(Sound.PIANO, 100, 1000);
 		}else {
 			move(true);
 		}

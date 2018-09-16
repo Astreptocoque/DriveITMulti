@@ -3,7 +3,7 @@ package ch.astrepto.robot.moteurs;
 import ch.astrepto.robot.RobotAttributs;
 import ch.astrepto.robot.Track;
 import ch.astrepto.robot.capteurs.ColorSensor;
-import ch.astrepto.robot.capteurs.TouchSensorEV3;
+import ch.astrepto.robot.capteurs.TouchSensorEV3Remote;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
@@ -13,13 +13,13 @@ import lejos.robotics.SampleProvider;
 
 public class DirectionMotor extends Moteur{
 	
-	private TouchSensorEV3 directionTouchSensor;
+	private TouchSensorEV3Remote directionTouchSensor;
 
-	public DirectionMotor(MoteursTypes type, Port port) {
+	public DirectionMotor(MoteursTypes type, Port port, TouchSensorEV3Remote directionTouchSensor) {
 		super(type, port);
 		this.maxSpeed = 160;
 		this.motor.setSpeed(this.maxSpeed);
-		this.directionTouchSensor = new TouchSensorEV3(SensorPort.S2);
+		this.directionTouchSensor = directionTouchSensor;
 
 		initPosition();
 	}
@@ -142,10 +142,6 @@ public class DirectionMotor extends Moteur{
 			firstIteration = false;
 		}
 		motor.resetTachoCount();
-	}
-
-	public void close() {
-		directionTouchSensor.close();
 	}
 	
 	public void waitComplete() {

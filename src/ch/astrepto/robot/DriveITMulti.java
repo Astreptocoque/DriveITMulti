@@ -13,19 +13,18 @@ public class DriveITMulti {
 		System.out.println("Placer le robot sur la piste et presser ENTER\n");
 		System.out.println("A gauche, sur le bleu");
 		System.out.println("A droite, sur le blanc");
-		Button.ENTER.waitForPressAndRelease();
+		Sound.twoBeeps();
+		rob.touch.waitForPressAndRelease();
 		Track.updateTrackInfos(rob.colorDroite.getValue());
-		System.out.println("Appuyer pour demarrer");
-		Button.ENTER.waitForPressAndRelease();
+		System.out.println("Analyse track ok, appuyez pour demarrer");
+		rob.touch.waitForPressAndRelease();
 		
-		rob.robotStart();
+		//rob.robotStart();
 		float intensity;
 		double speed;
 		double time1 = 0;
 		double time2 = 0;
-
-		rob.depassement();
-		Sound.beep();
+		double time = 0;
 		
 		do {
 			
@@ -48,6 +47,9 @@ public class DriveITMulti {
 				if(time2 == 0)
 					time1 = System.currentTimeMillis();
 				time2 = System.currentTimeMillis();
+		//		Sound.playNote(Sound.PIANO, 100, 1000);
+				time = time2-time1;
+				Sound.playTone((int)(100+time/8), 100, 100);
 				if(time2-time1 > 5000)
 					rob.depassement();
 			}else {

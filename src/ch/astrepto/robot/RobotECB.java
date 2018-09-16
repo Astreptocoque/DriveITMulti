@@ -2,12 +2,13 @@ package ch.astrepto.robot;
 
 import ch.astrepto.robot.capteurs.ColorSensor;
 import ch.astrepto.robot.capteurs.ColorSensorRemote;
+import ch.astrepto.robot.capteurs.TouchSensorEV3Remote;
+import ch.astrepto.robot.capteurs.TouchSensorNXT;
 import ch.astrepto.robot.capteurs.UltrasonicSensor;
 import ch.astrepto.robot.moteurs.DirectionMotor;
 import ch.astrepto.robot.moteurs.MoteursTypes;
 import ch.astrepto.robot.moteurs.TractionMotor;
 import ch.astrepto.robot.moteurs.UltrasonicMotor;
-import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
@@ -21,6 +22,9 @@ public class RobotECB {
 	public ColorSensor colorGauche;
 	public ColorSensorRemote colorDroite;
 	public UltrasonicSensor ultrasonic;
+	public TouchSensorNXT touch;
+	public TouchSensorEV3Remote directionTouchSensor;
+	public TouchSensorNXT ultrasonicTouchSensor;
 	public RobotRemote coffre;
 
 	private float intensity = 0;
@@ -31,16 +35,27 @@ public class RobotECB {
 	public RobotECB() {
 
 		coffre = new RobotRemote();
+		System.out.println("coffre - ok");
+		directionTouchSensor = new TouchSensorEV3Remote(coffre, "S4");
+		System.out.println("direc.Touch - ok");
 		colorGauche = new ColorSensor(SensorPort.S4);
+		System.out.println("colorGauche - ok");
 		colorDroite = new  ColorSensorRemote(coffre, "S1");
+		System.out.println("colorDroite - ok");
 		ultrasonic = new UltrasonicSensor(SensorPort.S3);
-		directionMotor = new DirectionMotor(MoteursTypes.EV3MediumMotor, MotorPort.A);
+		System.out.println("ultrasonic - ok");
+		touch = new TouchSensorNXT(SensorPort.S2);
+		System.out.println("touch - ok");
+		ultrasonicTouchSensor =  new TouchSensorNXT(SensorPort.S1);
+		System.out.println("ultr.Touch - ok");
+		
+		directionMotor = new DirectionMotor(MoteursTypes.EV3MediumMotor, MotorPort.A, directionTouchSensor);
+		System.out.println("direc.Motor - ok");
 		tractionMotor = new TractionMotor(MoteursTypes.EV3Motor, MotorPort.C, MotorPort.B);
-		Sound.setVolume(30);
-		Sound.beep();
-		ultrasonicMotor = new UltrasonicMotor(MoteursTypes.NXTMotor, MotorPort.D);
-		Sound.beep();
-		Sound.setVolume(100);
+		System.out.println("tract.Motor - ok");
+		ultrasonicMotor = new UltrasonicMotor(MoteursTypes.NXTMotor, MotorPort.D, ultrasonicTouchSensor);
+		System.out.println("ultr.Motor - ok");
+		Sound.setVolume(20);
 	}
 
 	public boolean updateDirection(boolean ultrasonicConnected) {
@@ -94,7 +109,7 @@ public class RobotECB {
 		// attente que l'autre coté soit libre
 		ultrasonicMotor.goTo(90 * directionOtherSide);
 		ultrasonicMotor.waitComplete();
-		while(ultrasonic.getValue() < 45)
+		while(ultrasonic.getValue() < 40)
 			Delay.msDelay(100);
 		ultrasonicMotor.goTo(0);		
 		
@@ -143,11 +158,12 @@ public class RobotECB {
 		
 		//virage 1
 		if(emplacement < Track.crossroadsLength)
-			angles[0] = 50;
+			angles[0] = 60;
 		else if (Track.getSide() == 1)
-			angles[0] = 70;
+			angles[0] = 80;
 		else
 			angles[0] = 10;
+		angles[0] = Math.toRadians(angles[0]);
 		mouvements[0] = angles[0] * rayon;
 		
 		//bout droit
@@ -166,20 +182,17 @@ public class RobotECB {
 		if(emplacement > longueurPiste)
 			emplacement = emplacement - longueurPiste;
 		if(emplacement < Track.crossroadsLength)
-			angles[1] = 50;
+			angles[1] = 60;
 		else if(Track.getSide() == 1)
 			angles[1] = 30;
 		else
 			angles[1] = 80;
+		angles[1] = Math.toRadians(angles[1]);
 		mouvements[2] = angles[1] * rayon;
 		
 		return mouvements;
 	}
 	
-	/**
-	 * Gestion du carrefour Une fois le carrefour détecté, cette section réagit en fonction du
-	 * côté du croisement
-	 */
 	public void crossroads() {
 
 		tractionMotor.move(false);
@@ -208,10 +221,6 @@ public class RobotECB {
 
 	}
 
-	/**
-	 * Gestion de la détection de la fin du carrefour Détecte la fin du carrefour et maj les
-	 * indications de piste
-	 */
 	public void crossroadsEnd() {
 		// on attends de l'avoir passé pour redémarrer les fonctions de direction
 		// on attends de l'avoir passé pour redémarrer les fonctions de direction
@@ -239,10 +248,6 @@ public class RobotECB {
 		}
 	}
 
-	/**
-	 * Gestion de la priorité de droite laisse continuer le robot seulement si aucun véhicule
-	 * devant avoir la priorité n'est détecté
-	 */
 	private void waitRightPriorityOk() {
 		
 		double distanceDetectBeforeCrossLine; // cm
@@ -313,10 +318,11 @@ public class RobotECB {
 		ultrasonicMotor.goTo(0);
 		colorDroite.close();
 		colorGauche.close();
-		directionMotor.close();
-		ultrasonicMotor.close();
+		touch.close();
+		ultrasonicTouchSensor.close();
+		directionTouchSensor.close();
 		ultrasonic.close();
-		coffre.disConnect();
+		
 	}
 
 	public void robotStart() {
