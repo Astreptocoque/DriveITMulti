@@ -51,7 +51,7 @@ public class DriveITMulti {
 				time2 = System.currentTimeMillis();
 				time = time2-time1;
 				Sound.playTone((int)(100+time/8), 100, 100);
-				if(time2-time1 > 5000)
+				if(time2-time1 > 4000)
 					rob.depassement();
 			}else {
 				time2 = 0;

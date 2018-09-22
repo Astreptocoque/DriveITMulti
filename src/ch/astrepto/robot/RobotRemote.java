@@ -10,8 +10,6 @@ public class RobotRemote {
 
 	/// permet la connection à la seconde brique
 	public  String name = "EV2";
-//	public  RemoteRequestEV3 brique;
-
 	public RemoteEV3 brique;
 	
 	public RobotRemote() {

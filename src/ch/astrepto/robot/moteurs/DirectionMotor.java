@@ -17,7 +17,7 @@ public class DirectionMotor extends Moteur{
 
 	public DirectionMotor(MoteursTypes type, Port port, TouchSensorEV3Remote directionTouchSensor) {
 		super(type, port);
-		this.maxSpeed = 160;
+		this.maxSpeed = RobotAttributs.maxSpeed;
 		this.motor.setSpeed(this.maxSpeed);
 		this.directionTouchSensor = directionTouchSensor;
 
@@ -65,7 +65,7 @@ public class DirectionMotor extends Moteur{
 		double angleCourbure;
 		double angleForMaxLum;
 		double angleForMinLum;
-		int angleCourbureContreDirection = 20;
+		int angleCourbureContreDirection = 10;
 		double maxDegreCourbureDegres = RobotAttributs.degresRoueToDegresCourbure(RobotAttributs.wheelMaxDegree);
 
 		//en fonction du coté de la piste

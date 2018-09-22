@@ -7,16 +7,17 @@ public abstract class RobotAttributs {
 	public final static float baseLength = 13f;
 	public final static double diametreEngrenage = 1.25f;
 	public final static double essieu = 1.7f;
-	public final static int ultrasonicMaxDegree = 2500; // de droit à un bord
+	public final static int ultrasonicMaxDegree = 2450; // de droit à un bord
 	public final static int wheelCourbureMax = 50;
 	public final static int wheelMaxDegree = degresCourbureToDegresRoue(wheelCourbureMax); // de droit à un bord
 	// LIMITES DE DETECTION D'UN VEHICULE
-	public final static float lastLimit = 15f; // en dessous, le robot stop
+	public final static float lastLimit = 20f; // en dessous, le robot stop
 	public final static float firstLimit = 30f; // passé cette limite, le robot est à plein régime
 	//public final static float crossingLimit = 50f; // limite de dégagement pour le croisement à priorité
 	
-	public final static float distHorizontalBetweenRobots = 23;
-	public final static int maxSpeed = 200;
+	public final static float distHorizontalBetweenRobots = 18;
+	public final static int maxSpeed = 300;
+	public final static int maxSpeedDepassement = 200;
 	public final static double angleDepassement = Math.toRadians(60);
 
 	public static int degresCourbureToDegresRoue(double angle) {

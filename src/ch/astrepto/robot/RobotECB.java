@@ -107,7 +107,8 @@ public class RobotECB {
 	public void depassement() {
 
 		int directionOtherSide = Track.getPart() * Track.getSide();
-		int speed = 100;
+		int speed = RobotAttributs.maxSpeedDepassement;
+		int isBlackLine = 0;
 		double rayon = RobotAttributs.wheelSpacing / Math.tan(Math.toRadians(RobotAttributs.wheelCourbureMax));
 		double mouvements[] = analyseDepassement(rayon);
 		
@@ -122,36 +123,52 @@ public class RobotECB {
 		tractionMotor.setSpeed(RobotAttributs.wheelCourbureMax*directionOtherSide*-1, speed);
 		directionMotor.goTo(RobotAttributs.wheelCourbureMax*directionOtherSide);
 		directionMotor.waitComplete();
-		goToCentimetres(mouvements[0]);
+		isBlackLine += goToCentimetres(mouvements[0]);
 				
 		//bout droit
 		tractionMotor.setSpeed(0, speed);
 		directionMotor.goTo(0);
 		directionMotor.waitComplete();
-		goToCentimetres(mouvements[1]);
+		isBlackLine += goToCentimetres(mouvements[1]);
 				
 		//2eme virage
 		tractionMotor.setSpeed(RobotAttributs.wheelCourbureMax*directionOtherSide, speed);
 		directionMotor.goTo(RobotAttributs.wheelCourbureMax*directionOtherSide*-1);
 		directionMotor.waitComplete();
-		goToCentimetres(mouvements[2]);
+		isBlackLine += goToCentimetres(mouvements[2]);
 		directionMotor.goTo(0);
 		directionMotor.waitComplete();
+		
+		// si on est passé au croisement
+		if(isBlackLine > 0) {
+			Track.inCrossroads = true;
+			Track.crossroads = true;
+			crossroadsEnd();
+		}else
+			Track.changeSide();
 	}
 	
-	private void goToCentimetres(double cm) {
+	private int goToCentimetres(double cm) {
 		
 		double intensity;
+		int isBlackLine = 0;
+		double degresBlackLine = 0;
 		double degresZero = tractionMotor.getCurrentDegres();
 		double degresToDo = RobotAttributs.centimetresToDegresTraction(cm);
+		double degresCurrent;
 		tractionMotor.move(true);
-		while(tractionMotor.getCurrentDegres() - degresZero < degresToDo) {
+		do{
 			intensity  = updateLightIntensity();
-			if (intensity <= Track.crossLineValue + 1)
+			if (intensity <= Track.crossLineValue + 1 && isBlackLine == 0) {
+				degresBlackLine = tractionMotor.getCurrentDegres();
 				tractionMotor.resetTachoCount();
-		}		
+				isBlackLine = 1;
+			}
+			degresCurrent = degresBlackLine + tractionMotor.getCurrentDegres();
+		}while(degresCurrent- degresZero < degresToDo);
 		tractionMotor.move(false);
 	
+		return isBlackLine;
 	}
 
 	private double[] analyseDepassement(double rayon) {
@@ -165,7 +182,7 @@ public class RobotECB {
 		if(emplacement < Track.crossroadsLength)
 			angles[0] = 60;
 		else if (Track.getSide() == 1)
-			angles[0] = 80;
+			angles[0] = 130;
 		else
 			angles[0] = 10;
 		angles[0] = Math.toRadians(angles[0]);
@@ -186,12 +203,13 @@ public class RobotECB {
 			longueurPiste = Track.crossroadsLength + Track.littleSideLength;
 		if(emplacement > longueurPiste)
 			emplacement = emplacement - longueurPiste;
+		
 		if(emplacement < Track.crossroadsLength)
 			angles[1] = 60;
 		else if(Track.getSide() == 1)
-			angles[1] = 30;
+			angles[1] = 0;
 		else
-			angles[1] = 80;
+			angles[1] = 60;
 		angles[1] = Math.toRadians(angles[1]);
 		mouvements[2] = angles[1] * rayon;
 		
@@ -210,7 +228,7 @@ public class RobotECB {
 
 		//correction
 		if (Track.getPart() == 1 && Track.getSide() == 1) 
-			directionMotor.goTo(-5); 
+			directionMotor.goTo(-8); 
 		 else if(Track.getPart() == -1 && Track.getSide() == 1)
 			  directionMotor.goTo(0); 
 		else 
@@ -321,6 +339,8 @@ public class RobotECB {
 		tractionMotor.move(false);
 		directionMotor.goTo(0);
 		ultrasonicMotor.goTo(0);
+		directionMotor.waitComplete();
+		ultrasonicMotor.waitComplete();
 		colorDroite.close();
 		colorGauche.close();
 		touch.close();
