@@ -17,7 +17,7 @@ public class DirectionMotor extends Moteur{
 
 	public DirectionMotor(MoteursTypes type, Port port, TouchSensorEV3Remote directionTouchSensor) {
 		super(type, port);
-		this.maxSpeed = RobotAttributs.maxSpeed;
+		this.maxSpeed = RobotAttributs.speedDirection;
 		this.motor.setSpeed(this.maxSpeed);
 		this.directionTouchSensor = directionTouchSensor;
 
@@ -103,10 +103,10 @@ public class DirectionMotor extends Moteur{
 	 */
 	private int positioningAdjustment(int sens) {
 		int angle;
-		if (sens == 1) {  // gauche
-			angle = 50;
+		if (sens == 1) {  // vient de la droite
+			angle = 55;
 		} else {
-			angle = -23; // droite
+			angle = -20; // vient de la gauche
 		}
 		return angle;
 	}

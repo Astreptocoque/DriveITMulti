@@ -13,9 +13,8 @@ public class DriveITMulti {
 		System.out.println("Placer le robot sur la piste et presser ENTER\n");
 		System.out.println("A gauche, sur le bleu");
 		System.out.println("A droite, sur le blanc");
-		Sound.twoBeeps();
 		rob.touch.waitForPressAndRelease();
-		Track.updateTrackInfos(rob.colorDroite.getValue());
+		rob.updateTrackInfos();
 		System.out.println("");
 		System.out.println("Analyse track ok, appuyez pour demarrer");
 		rob.touch.waitForPressAndRelease();
@@ -67,7 +66,9 @@ public class DriveITMulti {
 				rob.crossroadsEnd();
 
 		} while (!rob.touch.isPressed());
-
+		
+		Sound.beepSequence();
+		Sound.beepSequenceUp();
 		rob.robotStop();
 	}
 	

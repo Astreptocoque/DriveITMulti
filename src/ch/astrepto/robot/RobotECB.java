@@ -66,10 +66,11 @@ public class RobotECB {
 	public boolean updateDirection(boolean ultrasonicConnected) {
 		
 		if(ultrasonicConnected) {
-			if (ultrasonicMotor.isPreviousMoveComplete() && directionMotor.isPreviousMoveComplete()) {
+			if ( directionMotor.isPreviousMoveComplete()) {
 				currentDestination = directionMotor.angleFunctionOfIntensity(intensity);
 				directionMotor.goTo(currentDestination);
-				ultrasonicMotor.goTo(currentDestination);
+				if(ultrasonicMotor.isPreviousMoveComplete())
+					ultrasonicMotor.goTo(currentDestination);
 				return true;
 			}
 			else {
@@ -228,7 +229,9 @@ public class RobotECB {
 
 		//correction
 		if (Track.getPart() == 1 && Track.getSide() == 1) 
-			directionMotor.goTo(-8); 
+			directionMotor.goTo(-3); 
+		else if(Track.getPart() == 1 && Track.getSide() == -1)
+			directionMotor.goTo(-6);
 		 else if(Track.getPart() == -1 && Track.getSide() == 1)
 			  directionMotor.goTo(0); 
 		else 
@@ -278,9 +281,9 @@ public class RobotECB {
 		double zoneLastAngle; // degrés
 		
 		if(Track.side == 1) {
-			distanceDetectBeforeCrossLine = 50;
-			zoneFirstAngle = 20;
-			zoneLastAngle = 70;
+			distanceDetectBeforeCrossLine = 40;
+			zoneFirstAngle = 30;
+			zoneLastAngle = 60;
 		}else {
 			distanceDetectBeforeCrossLine = 60;
 			zoneFirstAngle = 40;
@@ -335,6 +338,25 @@ public class RobotECB {
 		ultrasonicMotor.waitComplete();
 	}
 
+	public void updateTrackInfos() {
+		// valeur 0 = partieHuit, valeur 1 = cotePiste
+
+		float intensityGauche = colorGauche.getValue();
+		float intensityDroite = colorDroite.getValue();
+
+		float diff = intensityGauche - intensityDroite;
+		
+		if(diff > 0)	{
+			Track.part = -1;
+		}else {
+			Track.part = 1;
+		}
+		// on commence toujours sur le grand côté
+		Track.side = 1;
+		
+		Sound.twoBeeps();
+	}
+	
 	public void robotStop() {
 		tractionMotor.move(false);
 		directionMotor.goTo(0);

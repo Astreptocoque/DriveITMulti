@@ -1,6 +1,7 @@
 package ch.astrepto.robot.moteurs;
 
 import ch.astrepto.robot.RobotAttributs;
+import ch.astrepto.robot.Track;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -15,7 +16,7 @@ public class TractionMotor {
 	private RegulatedMotor[] synchro;
 	
 	private static boolean isMoving = false;
-	private double speed = RobotAttributs.maxSpeed;
+	private double speed = RobotAttributs.maxSpeedBigSide;
 
 	public TractionMotor(MoteursTypes type, Port portLeft, Port portRight) {
 		motorLeft = new Moteur(type, portLeft);
@@ -41,8 +42,12 @@ public class TractionMotor {
 		
 		double speedLeft;
 		double speedRight;
-		double speedAtFirst = RobotAttributs.maxSpeed;
-		double speedAtLast = 0;
+		double speedAtFirst;
+		if(Track.getSide() == 1)
+			speedAtFirst = RobotAttributs.maxSpeedBigSide;
+		else
+			speedAtFirst = RobotAttributs.maxSpeedSmallSide;
+		double speedAtLast = 40;
 		
 		if(distance > RobotAttributs.firstLimit)
 			distance = RobotAttributs.firstLimit;
@@ -53,7 +58,10 @@ public class TractionMotor {
 		double b = speedAtFirst - (speedAtLast-speedAtFirst)/(RobotAttributs.lastLimit-RobotAttributs.firstLimit)*RobotAttributs.firstLimit;
 		double speed = a*distance +b;
 		
-		if(angleCourbure == 0 || (int) speed == 0) {
+		if((int) speed <= speedAtLast) {
+			speedLeft = 0;
+			speedRight = 0;
+		}else if (angleCourbure == 0) {
 			speedLeft = speed;
 			speedRight = speed;
 		}else{
@@ -71,8 +79,9 @@ public class TractionMotor {
 		motorLeft.motor.endSynchronization();
 		this.speed = speed;
 		
-		if (speed == 0) {
+		if (speed <= speedAtLast) {
 			move(false);
+			speed = 0;
 		}else {
 			move(true);
 		}

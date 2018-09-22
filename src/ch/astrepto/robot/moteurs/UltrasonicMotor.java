@@ -48,8 +48,8 @@ public class UltrasonicMotor extends Moteur{
 	public void goTo(double angleCourbature) {
 		
 		// arrête le moteur s'il est en train de bouger
-		if (motor.isMoving())
-			motor.stop();
+	/*	if (motor.isMoving())
+			motor.stop();*/
 		double angle = RobotAttributs.degresCourbureToDegresUltrason(angleCourbature);
 		double currentDegres = super.getCurrentDegres();
 		double angleToDo;

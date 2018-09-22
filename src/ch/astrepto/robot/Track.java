@@ -19,7 +19,7 @@ public class Track {
 	public static final float maxValue = 60; // blanc
 	public static final float minValue = 4; // bleu foncé
 	public static final float crossLineValue = 2; // ligne noire
-	public final static float crossroadsLength = 50; // en cm
+	public final static float crossroadsLength = 60; // en cm
 	public final static double littleSideLength = 3/4*2*Math.PI*(smallRadius+gradientWidth/2); //3/4 du cercle est la piste effective
 	public final static double largeSideLength = 3/4*2*Math.PI*(largeRadius-gradientWidth/2);
 
@@ -37,31 +37,6 @@ public class Track {
 	
 	public static int getPart() {
 		return part;
-	}
-	
-	/**
-	 * Gestion des informations de la piste Appelée en début de programme, cette méthode permet
-	 * au robot de se situer sur la piste. Le robot doit être placé sur le bleu extérieur si sur
-	 * la partie 1 de la piste, sur le blanc si sur la partie -1 de la piste
-	 * 
-	 * @param intensity
-	 *                l'intensité lumineuse mesurée
-	 */
-	public static void updateTrackInfos(float intensity) {
-		// valeur 0 = partieHuit, valeur 1 = cotePiste
-
-		// on relève la couleur du sol
-		if (intensity >= Track.maxValue - 15)
-			// si c'est le blanc, partie -1
-			Track.part = -1;
-		else
-			// sinon, partie 1
-			Track.part = 1;
-
-		// on commence toujours sur le grand côté
-		Track.side = 1;
-		
-		Sound.twoBeeps();
 	}
 
 }
