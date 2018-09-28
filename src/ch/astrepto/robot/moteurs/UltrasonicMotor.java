@@ -20,7 +20,7 @@ public class UltrasonicMotor extends Moteur{
 		initPosition();
 	}
 
-	private void initPosition() {
+	public void initPosition() {
 		motor.forward();
 		boolean boucle = true;
 	

@@ -59,8 +59,7 @@ public class RobotECB {
 		System.out.println("tract.Motor - ok");
 		ultrasonicMotor = new UltrasonicMotor(MoteursTypes.NXTMotor, MotorPort.D, ultrasonicTouchSensor);
 		System.out.println("ultr.Motor - ok");
-		Sound.setVolume(20);
-		Button.LEDPattern(1);
+	
 	}
 
 	public boolean updateDirection(boolean ultrasonicConnected) {

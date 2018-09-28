@@ -115,7 +115,7 @@ public class DirectionMotor extends Moteur{
 		return !motor.isMoving();
 	}
 	
-	private void initPosition() {
+	public void initPosition() {
 		motor.backward();
 		// cadrage du moteur, où qu'il soit
 		boolean boucle = true;
